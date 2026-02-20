@@ -1,0 +1,39 @@
+name: ✅ CI — Lint & Syntax Check
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Lint & Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: 🔍 Check syntax (py compile)
+        run: |
+          python -m py_compile product_research_agent.py
+          echo "✅ Syntax OK"
+
+      - name: 🎨 Check formatting (black)
+        run: |
+          black --check --diff product_research_agent.py
+
+      - name: 📋 Lint (flake8)
+        run: |
+          flake8 product_research_agent.py --max-line-length=120 --ignore=E501,W503
